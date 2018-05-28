@@ -1,5 +1,6 @@
 package io.github.ziginsider.epam_laba_13
 
+import android.app.ActivityManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -126,10 +127,18 @@ class LocationService : Service() {
     /**
      * Returns true if this is a foreground service.
      *
-     * @param context The {@link Context}.
+     * @param context The [Context].
      */
     fun serviceIsRunningInForeground(context: Context): Boolean {
-
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (javaClass.name == service.service.className) {
+                if (service.foreground) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     companion object {
