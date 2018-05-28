@@ -4,21 +4,61 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.app.NotificationManager
+import android.content.Context
 import android.location.Location
 import android.os.Binder
 import android.os.Handler
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationResult
+import android.os.HandlerThread
+import android.app.NotificationChannel
+import android.os.Build
+
+
+
+
+
+
+
 
 class LocationService : Service() {
     private var changingConfiguration = false
-    private val notificationManager: NotificationManager? = null
+    private var fusedLocationClient: FusedLocationProviderClient? = null
+    private var notificationManager: NotificationManager? = null
     private val locationRequest: LocationRequest? = null
-    private val locationCallback: LocationCallback? = null
-    private val serviceHandler: Handler? = null
+    private var locationCallback: LocationCallback? = null
+    private var serviceHandler: Handler? = null
     private val currentLocation: Location? = null
     private val binder = LocalBinder()
+
+    override fun onCreate() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+                sendNewLocation(locationResult.lastLocation)
+            }
+        }
+
+        createLocationRequest()
+        addOnCompleteListener()
+
+        val handlerThread = HandlerThread(TAG)
+        handlerThread.start()
+        serviceHandler = Handler(handlerThread.looper)
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.app_name)
+            notificationManager?.createNotificationChannel(NotificationChannel(CHANNEL_ID, name,
+                    NotificationManager.IMPORTANCE_DEFAULT))
+        }
+    }
 
     override fun onBind(p0: Intent?): IBinder {
         stopForeground(true)
@@ -32,6 +72,8 @@ class LocationService : Service() {
         }
         return true
     }
+
+
 
     inner class LocalBinder : Binder() {
         internal var service: LocationService? = null
