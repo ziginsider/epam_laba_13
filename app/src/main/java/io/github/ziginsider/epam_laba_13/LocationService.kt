@@ -100,7 +100,19 @@ class LocationService : Service() {
         internal var service: LocationService? = null
             get() = this@LocationService
             private set
+    }
 
+    fun removeLocationUpdates() {
+        logi(TAG, "[ Removing location updates ]")
+        try {
+            fusedLocationClient?.removeLocationUpdates(locationCallback)
+            setRequestingLocationUpdates(this, false)
+            stopSelf()
+        } catch (e: SecurityException) {
+            setRequestingLocationUpdates(this, true)
+            loge(TAG, "[ Lost location permission. Could not remove updates ]")
+            e.printStackTrace()
+        }
     }
 
     private fun createLocationRequest() {
@@ -124,7 +136,7 @@ class LocationService : Service() {
                         }
                     }
         } catch (e: SecurityException) {
-            loge(TAG, "[ Lost location permission: $e ]")
+            loge(TAG, "[ Lost location permission ]")
             e.printStackTrace()
         }
     }
@@ -132,16 +144,13 @@ class LocationService : Service() {
     private fun sendNewLocation(location: Location) {
         logi(TAG, "[ New location = $location ]")
         currentLocation = location
-
         LocalBroadcastManager.getInstance(applicationContext)
                 .sendBroadcast(Intent(ACTION_BROADCAST).apply {
                     putExtra(EXTRA_LOCATION, location)
                 })
-
         if (serviceIsRunningInForeground(this)) {
             notificationManager?.notify(NOTIFICATION_ID, getNotification())
         }
-
     }
 
     /**
@@ -170,7 +179,6 @@ class LocationService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT)
         val activityPendingIntent = PendingIntent.getActivity(this, 0,
                 Intent(this, MainActivity::class.java), 0)
-
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
                 .addAction(R.drawable.ic_location_launch, getString(R.string.launch_activity),
                         activityPendingIntent)
@@ -186,6 +194,7 @@ class LocationService : Service() {
     }
 
     companion object {
+
         private val TAG = LocationService::class.java.simpleName
         private const val PACKAGE_NAME = "io.github.ziginsider.epam_laba_13"
         private const val CHANNEL_ID = "channel_13"
@@ -195,6 +204,5 @@ class LocationService : Service() {
         private const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
         private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2
         private const val NOTIFICATION_ID = 12345678
-
     }
 }
