@@ -106,6 +106,25 @@ class LocationService : Service() {
             private set
     }
 
+    /**
+     * Makes a request for location updates. Logs the [SecurityException].
+     */
+    fun requestLocationUpdates() {
+        logi(TAG, "[ Request location updates ]")
+        setRequestingLocationUpdates(this, true)
+        startService(Intent(applicationContext, LocationService::class.java))
+        try {
+
+        } catch (e: SecurityException) {
+            setRequestingLocationUpdates(this, false)
+            loge(TAG, "[ Lost location permission. Could not remove updates ]")
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Removes location updates. Logs the [SecurityException].
+     */
     fun removeLocationUpdates() {
         logi(TAG, "[ Removing location updates ]")
         try {
