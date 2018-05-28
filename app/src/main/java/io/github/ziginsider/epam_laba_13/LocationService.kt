@@ -48,6 +48,8 @@ class LocationService : Service() {
 
     companion object {
 
+
+
         private val TAG = LocationService::class.java.simpleName
         private const val PACKAGE_NAME = "io.github.ziginsider.epam_laba_13"
         private const val CHANNEL_ID = "channel_1"
