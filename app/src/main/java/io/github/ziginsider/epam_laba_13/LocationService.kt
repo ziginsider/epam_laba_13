@@ -81,6 +81,13 @@ class LocationService : Service() {
         return binder
     }
 
+    override fun onRebind(intent: Intent) {
+        logi(TAG, "[ in onRebind() ]")
+        stopForeground(true)
+        changingConfiguration = false
+        super.onRebind(intent)
+    }
+
     override fun onUnbind(intent: Intent?): Boolean {
         if (!changingConfiguration && requestingLocationUpdates(this)) {
             startForeground(NOTIFICATION_ID, getNotification())
