@@ -95,6 +95,10 @@ class LocationService : Service() {
         return true
     }
 
+    override fun onDestroy() {
+        serviceHandler?.removeCallbacksAndMessages(null)
+    }
+
     inner class LocalBinder : Binder() {
 
         internal var service: LocationService? = null
