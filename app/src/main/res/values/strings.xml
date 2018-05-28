@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">epam_laba_13</string>
+
+    <string name="location_updated">Location Updated: %1$s</string>
 </resources>
