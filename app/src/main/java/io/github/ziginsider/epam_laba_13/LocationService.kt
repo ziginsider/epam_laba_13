@@ -18,18 +18,12 @@ import android.os.HandlerThread
 import android.app.NotificationChannel
 import android.os.Build
 
-
-
-
-
-
-
-
 class LocationService : Service() {
+
     private var changingConfiguration = false
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var notificationManager: NotificationManager? = null
-    private val locationRequest: LocationRequest? = null
+    private var locationRequest: LocationRequest? = null
     private var locationCallback: LocationCallback? = null
     private var serviceHandler: Handler? = null
     private val currentLocation: Location? = null
@@ -73,12 +67,19 @@ class LocationService : Service() {
         return true
     }
 
-
-
     inner class LocalBinder : Binder() {
+
         internal var service: LocationService? = null
             get() = this@LocationService
             private set
+    }
+
+    private fun createLocationRequest() {
+        locationRequest = LocationRequest().apply {
+            interval = UPDATE_INTERVAL_IN_MILLISECONDS
+            fastestInterval = FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
     }
 
     companion object {
