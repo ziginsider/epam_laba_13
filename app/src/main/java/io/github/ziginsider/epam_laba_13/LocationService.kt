@@ -17,7 +17,9 @@ import com.google.android.gms.location.LocationResult
 import android.os.HandlerThread
 import android.app.NotificationChannel
 import android.os.Build
+import android.support.v4.content.LocalBroadcastManager
 import io.github.ziginsider.epam_laba_13.utils.loge
+import io.github.ziginsider.epam_laba_13.utils.logi
 
 class LocationService : Service() {
 
@@ -34,9 +36,13 @@ class LocationService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
+            override fun onLocationResult(locationResult: LocationResult?) {
                 super.onLocationResult(locationResult)
-                sendNewLocation(locationResult.lastLocation)
+                if (locationResult == null) {
+                    loge(TAG, "[ Failed to get location ]")
+                } else {
+                    sendNewLocation(locationResult.lastLocation)
+                }
             }
         }
 
@@ -100,6 +106,30 @@ class LocationService : Service() {
             loge(TAG, "[ Lost location permission: $e ]")
             e.printStackTrace()
         }
+    }
+
+    private fun sendNewLocation(location: Location) {
+        logi(TAG, "[ New location = $location ]")
+        currentLocation = location
+
+        LocalBroadcastManager.getInstance(applicationContext)
+                .sendBroadcast(Intent(ACTION_BROADCAST).apply {
+                    putExtra(EXTRA_LOCATION, location)
+                })
+
+        if (serviceIsRunningInForeground(this)) {
+            notificationManager?.notify(NOTIFICATION_ID, getNotification())
+        }
+
+    }
+
+    /**
+     * Returns true if this is a foreground service.
+     *
+     * @param context The {@link Context}.
+     */
+    fun serviceIsRunningInForeground(context: Context): Boolean {
+
     }
 
     companion object {
