@@ -61,8 +61,7 @@ class LocationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         logi(TAG, "[ Service started ]")
-        val startedFromNotification
-                = intent?.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false)
+        val startedFromNotification = intent?.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false)
         if (startedFromNotification!!) {
             removeLocationUpdates()
             stopSelf()
