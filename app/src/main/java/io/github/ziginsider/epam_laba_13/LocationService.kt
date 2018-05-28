@@ -72,13 +72,22 @@ class LocationService : Service() {
         internal var service: LocationService? = null
             get() = this@LocationService
             private set
-    }
 
+    }
     private fun createLocationRequest() {
         locationRequest = LocationRequest().apply {
             interval = UPDATE_INTERVAL_IN_MILLISECONDS
             fastestInterval = FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+
+    private fun addOnCompleteListener() {
+        try {
+
+        } catch (e: SecurityException) {
+
+            
         }
     }
 
