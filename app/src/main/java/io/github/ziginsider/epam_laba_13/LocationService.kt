@@ -1,26 +1,22 @@
 package io.github.ziginsider.epam_laba_13
 
-import android.app.ActivityManager
-import android.app.Service
+import android.app.*
 import android.content.Intent
 import android.os.IBinder
-import android.app.NotificationManager
 import android.content.Context
 import android.location.Location
 import android.os.Binder
 import android.os.Handler
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
-import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationResult
 import android.os.HandlerThread
-import android.app.NotificationChannel
 import android.os.Build
+import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
-import io.github.ziginsider.epam_laba_13.utils.loge
-import io.github.ziginsider.epam_laba_13.utils.logi
+import io.github.ziginsider.epam_laba_13.utils.*
 
 class LocationService : Service() {
 
@@ -139,6 +135,30 @@ class LocationService : Service() {
             }
         }
         return false
+    }
+
+    private fun getNotification(): Notification? {
+        val textLocation = getLocationText(currentLocation)
+        val intent = Intent(this, LocationService::class.java).apply {
+            putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true)
+        }
+        val servicePendingIntent = PendingIntent.getService(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT)
+        val activityPendingIntent = PendingIntent.getActivity(this, 0,
+                Intent(this, MainActivity::class.java), 0)
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                .addAction(R.drawable.ic_location_launch, getString(R.string.launch_activity),
+                        activityPendingIntent)
+                .addAction(R.drawable.ic_location_cancel,
+                        getString(R.string.remove_location_updates), servicePendingIntent)
+                .setContentText(textLocation)
+                .setContentTitle(getLocationTitle(this))
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setWhen(System.currentTimeMillis())
+        return builder.build()
     }
 
     companion object {
