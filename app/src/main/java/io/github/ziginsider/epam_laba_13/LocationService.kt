@@ -9,6 +9,7 @@ import android.os.Binder
 import android.os.Handler
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
+import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 
 class LocationService : Service() {
     private var changingConfiguration = false
@@ -23,6 +24,13 @@ class LocationService : Service() {
         stopForeground(true)
         changingConfiguration = false
         return binder
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        if (!changingConfiguration && requestingLocationUpdates(this)) {
+            startForeground(NOTIFICATION_ID, getNotification())
+        }
+        return true
     }
 
     inner class LocalBinder : Binder() {
