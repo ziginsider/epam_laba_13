@@ -2,19 +2,15 @@ package io.github.ziginsider.epam_laba_13
 
 import android.app.*
 import android.content.Intent
-import android.os.IBinder
 import android.content.Context
 import android.content.res.Configuration
 import android.location.Location
-import android.os.Binder
-import android.os.Handler
+import android.os.*
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationResult
-import android.os.HandlerThread
-import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import io.github.ziginsider.epam_laba_13.utils.*
@@ -114,7 +110,8 @@ class LocationService : Service() {
         setRequestingLocationUpdates(this, true)
         startService(Intent(applicationContext, LocationService::class.java))
         try {
-
+            fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback,
+                    Looper.myLooper())
         } catch (e: SecurityException) {
             setRequestingLocationUpdates(this, false)
             loge(TAG, "[ Lost location permission. Could not remove updates ]")
@@ -225,7 +222,8 @@ class LocationService : Service() {
         private const val EXTRA_LOCATION = "$PACKAGE_NAME.location"
         private const val EXTRA_STARTED_FROM_NOTIFICATION = "$PACKAGE_NAME.started_from_notification"
         private const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
-        private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2
+        private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
+                = UPDATE_INTERVAL_IN_MILLISECONDS / 2
         private const val NOTIFICATION_ID = 12345678
     }
 }
