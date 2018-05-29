@@ -65,6 +65,16 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         super.onPause()
     }
 
+    override fun onStop() {
+        if (isBound) {
+            unbindService(serviceConnection)
+            isBound = false
+        }
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this)
+        super.onStop()
+    }
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName?, localService: IBinder?) {
             val binder = localService as LocationService.LocalBinder
