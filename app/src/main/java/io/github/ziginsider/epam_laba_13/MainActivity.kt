@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 if (isLastLocation) {
                     val line = map?.addPolyline(PolylineOptions()
                             .add(LatLng(lastLatitude, lastLongitude), LatLng(it.latitude, it.longitude))
-                            .width(5f)
+                            .width(12f)
                             .color(Color.RED))
 
                     lastLatitude = it.latitude
@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     lastLongitude = it.longitude
                 }
 
-
+                map?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude)))
             }
         }
     }
