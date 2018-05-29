@@ -22,5 +22,9 @@
             android:name=".LocationService"
             android:enabled="true"
             android:exported="true" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAWsYwlctDIWvWjo3AWougr8H0sdMJVWl8"/>
     </application>
 </manifest>
