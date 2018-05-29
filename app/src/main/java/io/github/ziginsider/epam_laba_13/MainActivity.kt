@@ -11,17 +11,22 @@ import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
 import io.github.ziginsider.epam_laba_13.utils.getLocationText
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener
+        , OnMapReadyCallback {
 
     private lateinit var myReceiver: MyReceiver
     private var service: LocationService? = null
     private var isBound = false
+    private var map: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +38,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 requestPermission()
             }
         }
+
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     override fun onStart() {
@@ -135,6 +143,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_PERMISSION_LOCATION)
+    }
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        googleMap ?: return
+        map = googleMap
     }
 
     companion object {
