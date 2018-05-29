@@ -7,6 +7,7 @@ import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
@@ -31,6 +32,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 requestPermission()
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this)
+        requestLocationButton.setOnClickListener {
+            if (checkPermission()) {
+                service?.requestLocationUpdates()
+            } else {
+                requestPermission()
+            }
+        }
+        removeLocationButton.setOnClickListener {
+            service?.removeLocationUpdates()
+        }
+        setButtonState(requestingLocationUpdates(this))
+        bindService(Intent(this, LocationService::class.java), serviceConnection,
+                Context.BIND_AUTO_CREATE)
     }
 
     private val serviceConnection = object : ServiceConnection {
