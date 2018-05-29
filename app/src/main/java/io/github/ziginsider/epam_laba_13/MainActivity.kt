@@ -9,19 +9,21 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
 import io.github.ziginsider.epam_laba_13.utils.getLocationText
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val myReceiver: MyReceiver? = null
+    private var myReceiver: MyReceiver? = null
     private var service: LocationService? = null
     private var isBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        myReceiver = MyReceiver()
         setContentView(R.layout.activity_main)
 
         if (requestingLocationUpdates(this)) {
@@ -65,6 +67,12 @@ class MainActivity : AppCompatActivity() {
             location?.let {
                 textLocation.text = getLocationText(it)
             }
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, str: String?) {
+        if (str == KEY_REQUESTING_LOCATION_UPDATES) {
+            setButtonState(sharedPreferences.getBoolean(KEY_REQUESTING_LOCATION_UPDATES, false))
         }
     }
 

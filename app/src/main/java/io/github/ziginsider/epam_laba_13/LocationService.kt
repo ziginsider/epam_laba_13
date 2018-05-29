@@ -15,7 +15,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import io.github.ziginsider.epam_laba_13.utils.*
 
-class LocationService : Service(), IBinder {
+class LocationService : Service() {
 
     private var changingConfiguration = false
     private var fusedLocationClient: FusedLocationProviderClient? = null
