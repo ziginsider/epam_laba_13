@@ -21,8 +21,9 @@ import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 
 
@@ -34,10 +35,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private var isBound = false
     private var map: GoogleMap? = null
     private var isLastLocation = false
-    private var currentLatitude = 0.0
-    private var currentLongitude = 0.0
     private var lastLatitude = 0.0
     private var lastLongitude = 0.0
+    private var marker: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,20 +129,24 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 textLocation.text = getLocationText(it)
 
                 if (isLastLocation) {
+                    marker?.remove()
                     val line = map?.addPolyline(PolylineOptions()
                             .add(LatLng(lastLatitude, lastLongitude),
                                     LatLng(it.latitude, it.longitude))
-                            .width(12f)
+                            .width(LINE_WIDTH)
                             .color(Color.RED))
 
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
+                    marker = map?.addMarker(MarkerOptions()
+                            .position(LatLng(lastLongitude, lastLongitude))
+                            .title("Current position"))
                 } else {
                     isLastLocation = true
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
                     map?.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(LatLng(it.latitude, it.longitude), 20.0f))
+                            .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
                 }
             }
         }
@@ -183,5 +187,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     companion object {
 
         const val REQUEST_PERMISSION_LOCATION = 33
+        private const val LINE_WIDTH = 12.0f
+        private const val MAP_ZOOM = 15.0f
     }
 }
