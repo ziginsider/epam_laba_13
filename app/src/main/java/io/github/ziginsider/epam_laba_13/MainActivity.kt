@@ -76,6 +76,16 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    private fun setButtonState(requestingLocationUpdates: Boolean) {
+        if (requestingLocationUpdates) {
+            requestLocationButton.isEnabled = false
+            removeLocationButton.isEnabled = true
+        } else {
+            requestLocationButton.isEnabled = true
+            removeLocationButton.isEnabled = false
+        }
+    }
+
     private fun checkPermission() = ContextCompat.checkSelfPermission(this,
             Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
