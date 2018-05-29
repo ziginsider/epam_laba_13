@@ -1,16 +1,18 @@
 package io.github.ziginsider.epam_laba_13
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
+import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import io.github.ziginsider.epam_laba_13.utils.getLocationText
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.toast
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +55,15 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     toast("Permission denied")
                 }
+            }
+        }
+    }
+
+    private inner class MyReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val location = intent?.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
+            location?.let {
+                textLocation.text = getLocationText(it)
             }
         }
     }
