@@ -26,9 +26,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 
 
-
-
-
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener
         , OnMapReadyCallback {
 
@@ -133,7 +130,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                 if (isLastLocation) {
                     val line = map?.addPolyline(PolylineOptions()
-                            .add(LatLng(lastLatitude, lastLongitude), LatLng(it.latitude, it.longitude))
+                            .add(LatLng(lastLatitude, lastLongitude),
+                                    LatLng(it.latitude, it.longitude))
                             .width(12f)
                             .color(Color.RED))
 
@@ -143,9 +141,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     isLastLocation = true
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
+                    map?.animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(LatLng(it.latitude, it.longitude), 20.0f))
                 }
-
-                map?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude)))
             }
         }
     }
