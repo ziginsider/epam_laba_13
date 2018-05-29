@@ -15,7 +15,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import io.github.ziginsider.epam_laba_13.utils.*
 
-class LocationService : Service() {
+class LocationService : Service(), IBinder {
 
     private var changingConfiguration = false
     private var fusedLocationClient: FusedLocationProviderClient? = null
@@ -97,8 +97,7 @@ class LocationService : Service() {
 
     inner class LocalBinder : Binder() {
 
-        internal var service: LocationService? = null
-            get() = this@LocationService
+        internal var service = this@LocationService
             private set
     }
 

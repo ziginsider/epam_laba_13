@@ -1,15 +1,22 @@
 package io.github.ziginsider.epam_laba_13
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.toast
 
 class MainActivity : AppCompatActivity() {
+
+    private val myReceiver: MyReceiver? = null
+    private var service: LocationService? = null
+    private var isBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +26,19 @@ class MainActivity : AppCompatActivity() {
             if (!checkPermission()) {
                 requestPermission()
             }
+        }
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName?, localService: IBinder?) {
+            val binder = localService as LocationService.LocalBinder
+            service = binder.service
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(className: ComponentName?) {
+            service = null
+            isBound = false
         }
     }
 
