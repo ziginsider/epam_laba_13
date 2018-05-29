@@ -3,6 +3,7 @@ package io.github.ziginsider.epam_laba_13
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +20,14 @@ import io.github.ziginsider.epam_laba_13.utils.getLocationText
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolylineOptions
+
+
+
+
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener
         , OnMapReadyCallback {
@@ -27,6 +36,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private var service: LocationService? = null
     private var isBound = false
     private var map: GoogleMap? = null
+    private var isLastLocation = false
+    private var currentLatitude = 0.0
+    private var currentLongitude = 0.0
+    private var lastLatitude = 0.0
+    private var lastLongitude = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +130,22 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             val location = intent?.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
             location?.let {
                 textLocation.text = getLocationText(it)
+
+                if (isLastLocation) {
+                    val line = map?.addPolyline(PolylineOptions()
+                            .add(LatLng(lastLatitude, lastLongitude), LatLng(it.latitude, it.longitude))
+                            .width(5f)
+                            .color(Color.RED))
+
+                    lastLatitude = it.latitude
+                    lastLongitude = it.longitude
+                } else {
+                    isLastLocation = true
+                    lastLatitude = it.latitude
+                    lastLongitude = it.longitude
+                }
+
+
             }
         }
     }
@@ -148,6 +178,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     override fun onMapReady(googleMap: GoogleMap?) {
         googleMap ?: return
         map = googleMap
+
+
     }
 
     companion object {
