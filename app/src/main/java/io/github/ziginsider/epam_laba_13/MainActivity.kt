@@ -60,6 +60,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 IntentFilter(LocationService.ACTION_BROADCAST))
     }
 
+    override fun onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver)
+        super.onPause()
+    }
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName?, localService: IBinder?) {
             val binder = localService as LocationService.LocalBinder
