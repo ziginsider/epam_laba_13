@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
 import io.github.ziginsider.epam_laba_13.utils.getLocationText
 import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
@@ -18,7 +19,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private var myReceiver: MyReceiver? = null
+    private lateinit var myReceiver: MyReceiver
     private var service: LocationService? = null
     private var isBound = false
 
@@ -51,6 +52,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         setButtonState(requestingLocationUpdates(this))
         bindService(Intent(this, LocationService::class.java), serviceConnection,
                 Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
+                IntentFilter(LocationService.ACTION_BROADCAST))
     }
 
     private val serviceConnection = object : ServiceConnection {
