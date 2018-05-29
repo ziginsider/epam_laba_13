@@ -129,7 +129,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 textLocation.text = getLocationText(it)
 
                 if (isLastLocation) {
-                    marker?.remove()
                     val line = map?.addPolyline(PolylineOptions()
                             .add(LatLng(lastLatitude, lastLongitude),
                                     LatLng(it.latitude, it.longitude))
@@ -138,13 +137,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
-                    marker = map?.addMarker(MarkerOptions()
-                            .position(LatLng(lastLongitude, lastLongitude))
-                            .title("Current position"))
+                    
+                    marker?.position = LatLng(lastLatitude, lastLongitude)
                 } else {
                     isLastLocation = true
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
+                    marker = map?.addMarker(MarkerOptions()
+                            .position(LatLng(lastLongitude, lastLongitude))
+                            .title("Current position"))
                     map?.animateCamera(CameraUpdateFactory
                             .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
                 }
