@@ -56,31 +56,37 @@ class BoundMapManager {
                 val location = intent?.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
                 location?.let {
                     if (isLastLocation) {
-                        val line = map.addPolyline(PolylineOptions()
-                                .add(LatLng(lastLatitude, lastLongitude),
-                                        LatLng(it.latitude, it.longitude))
-                                .width(LINE_WIDTH)
-                                .color(Color.RED)
-                                .clickable(true))
-
+                        addNewLine(it)
                         lastLatitude = it.latitude
                         lastLongitude = it.longitude
-
                         marker?.position = LatLng(lastLatitude, lastLongitude)
                     } else {
                         isLastLocation = true
                         lastLatitude = it.latitude
                         lastLongitude = it.longitude
-                        map.run {
-                            marker = addMarker(MarkerOptions()
-                                    .position(LatLng(lastLatitude, lastLongitude))
-                                    .title("Current position"))
-                            animateCamera(CameraUpdateFactory
-                                    .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
-                            setOnPolylineClickListener { polyline ->
-                                polyline.color = polyline.color xor 0x00ffffff
-                            }
-                        }
+                        initMap(it)
+                    }
+                }
+            }
+
+            private fun addNewLine(location: Location) {
+                map.addPolyline(PolylineOptions()
+                        .add(LatLng(lastLatitude, lastLongitude),
+                                LatLng(location.latitude, location.longitude))
+                        .width(LINE_WIDTH)
+                        .color(Color.RED)
+                        .clickable(true))
+            }
+
+            private fun initMap(location: Location) {
+                map.run {
+                    marker = addMarker(MarkerOptions()
+                            .position(LatLng(lastLatitude, lastLongitude))
+                            .title("Current position"))
+                    animateCamera(CameraUpdateFactory
+                            .newLatLngZoom(LatLng(location.latitude, location.longitude), MAP_ZOOM))
+                    setOnPolylineClickListener { polyline ->
+                        polyline.color = polyline.color xor 0x00ffffff
                     }
                 }
             }
