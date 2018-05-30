@@ -59,9 +59,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (requestingLocationUpdates(this)) {
             if (!checkPermission()) {
                 requestPermission()
+            } else {
+                val locationListener
+                        = BoundLocationManager.bindLocationListenerIn(applicationContext, this)
+            }
         }
-
-        val locationListener = BoundLocationManager.bindLocationListenerIn(applicationContext, this)
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
