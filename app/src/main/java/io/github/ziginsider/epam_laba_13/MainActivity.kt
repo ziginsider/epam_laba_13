@@ -15,18 +15,27 @@ import android.support.v4.content.LocalBroadcastManager
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
-import io.github.ziginsider.epam_laba_13.utils.getLocationText
-import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
-import io.github.ziginsider.epam_laba_13.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import io.github.ziginsider.epam_laba_13.utils.*
 
-
+/**
+ * Activity that uses a bound and started service [LocationService] for location updates.
+ *
+ * After requesting location updates, when the activity ceases to be in the foreground,
+ * the service promotes itself to a foreground service and continues receiving location updates.
+ * When the activity comes back to the foreground, the foreground service stops, and the
+ * notification associated with that foreground service is removed.
+ *
+ * Activity draws a location path (polylines) on a map
+ *
+ * @since 2018-05-28
+ * @author Alex Kisel
+ */
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener
         , OnMapReadyCallback {
 
@@ -47,11 +56,18 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (requestingLocationUpdates(this)) {
             if (!checkPermission()) {
                 requestPermission()
+            } else {
+                bindLocationListener()
             }
         }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    private fun bindLocationListener() {
+        BoundLocationManager.bindLocationListenerIn(this, this,
+                requestLocationButton, removeLocationButton)
     }
 
     override fun onStart() {
@@ -95,6 +111,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private val serviceConnection = object : ServiceConnection {
+
         override fun onServiceConnected(className: ComponentName?, localService: IBinder?) {
             val binder = localService as LocationService.LocalBinder
             service = binder.service
@@ -115,8 +132,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 if (grantResults.isNotEmpty()
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     toast("Permission granted")
+                    bindLocationListener()
                 } else {
-                    toast("Permission denied")
+                    toast("Permission denied. Unfortunately, the app won't work correctly")
+                    requestLocationButton.hide()
+                    removeLocationButton.hide()
                 }
             }
         }
@@ -133,21 +153,27 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                             .add(LatLng(lastLatitude, lastLongitude),
                                     LatLng(it.latitude, it.longitude))
                             .width(LINE_WIDTH)
-                            .color(Color.RED))
+                            .color(Color.RED)
+                            .clickable(true))
 
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
-                    
+
                     marker?.position = LatLng(lastLatitude, lastLongitude)
                 } else {
                     isLastLocation = true
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
-                    marker = map?.addMarker(MarkerOptions()
-                            .position(LatLng(lastLongitude, lastLongitude))
-                            .title("Current position"))
-                    map?.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
+                    map?.run {
+                        marker = addMarker(MarkerOptions()
+                                .position(LatLng(lastLatitude, lastLongitude))
+                                .title("Current position"))
+                        animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
+                        setOnPolylineClickListener { polyline ->
+                            polyline.color = polyline.color xor 0x00ffffff
+                        }
+                    }
                 }
             }
         }
@@ -181,8 +207,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     override fun onMapReady(googleMap: GoogleMap?) {
         googleMap ?: return
         map = googleMap
-
-
     }
 
     companion object {

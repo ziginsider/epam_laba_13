@@ -15,6 +15,16 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import io.github.ziginsider.epam_laba_13.utils.*
 
+/**
+ * An Bound and Started Service that is promoted to a foreground service when
+ * location updates have been requested and all clients unbind.
+ *
+ * For location requesting this implementation provides access to the Fused Location Provider API
+ * [com.google.android.gms.location.FusedLocationProviderApi].
+ *
+ * @since 2018-05-28
+ * @author Alex Kisel
+ */
 class LocationService : Service() {
 
     private var changingConfiguration = false
@@ -71,7 +81,7 @@ class LocationService : Service() {
         changingConfiguration = true
     }
 
-    override fun onBind(p0: Intent?): IBinder {
+    override fun onBind(intent: Intent?): IBinder {
         stopForeground(true)
         changingConfiguration = false
         return binder
@@ -198,6 +208,7 @@ class LocationService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT)
         val activityPendingIntent = PendingIntent.getActivity(this, 0,
                 Intent(this, MainActivity::class.java), 0)
+
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
                 .addAction(R.drawable.ic_location_launch, getString(R.string.launch_activity),
                         activityPendingIntent)
@@ -219,7 +230,8 @@ class LocationService : Service() {
         private const val CHANNEL_ID = "channel_13"
         const val ACTION_BROADCAST = "$PACKAGE_NAME.broadcast"
         const val EXTRA_LOCATION = "$PACKAGE_NAME.location"
-        private const val EXTRA_STARTED_FROM_NOTIFICATION = "$PACKAGE_NAME.started_from_notification"
+        private const val EXTRA_STARTED_FROM_NOTIFICATION
+                = "$PACKAGE_NAME.started_from_notification"
         private const val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
         private const val FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS
                 = UPDATE_INTERVAL_IN_MILLISECONDS / 2
