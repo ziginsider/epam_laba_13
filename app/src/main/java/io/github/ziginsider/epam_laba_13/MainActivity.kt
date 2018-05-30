@@ -146,7 +146,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                             .add(LatLng(lastLatitude, lastLongitude),
                                     LatLng(it.latitude, it.longitude))
                             .width(LINE_WIDTH)
-                            .color(Color.RED))
+                            .color(Color.RED)
+                            .clickable(true))
+
 
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
@@ -156,12 +158,16 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     isLastLocation = true
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
-                    marker = map?.addMarker(MarkerOptions()
-                            .position(LatLng(lastLatitude, lastLongitude))
-                            .title("Current position"))
-
-                    map?.animateCamera(CameraUpdateFactory
-                            .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
+                    map?.run {
+                        marker = addMarker(MarkerOptions()
+                                .position(LatLng(lastLatitude, lastLongitude))
+                                .title("Current position"))
+                        animateCamera(CameraUpdateFactory
+                                .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
+                        setOnPolylineClickListener { polyline ->
+                            polyline.color = polyline.color xor 0x00ffffff
+                        }
+                    }
                 }
             }
         }
