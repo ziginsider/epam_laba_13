@@ -6,12 +6,17 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.SyncRequest
 import android.preference.PreferenceManager
+import android.widget.Button
 import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
 
 class BoundLocationManager {
 
-    class BoundLocationListener(val context: Context, val lifecycleOwner: LifecycleOwner)
+    class BoundLocationListener(val context: Context,
+                                val lifecycleOwner: LifecycleOwner,
+                                val requestLocationButton: Button,
+                                val removeLocationButton: Button)
         : LifecycleObserver, SharedPreferences.OnSharedPreferenceChangeListener {
 
         init {
@@ -22,6 +27,9 @@ class BoundLocationManager {
         fun initLocationActivityState() {
             PreferenceManager.getDefaultSharedPreferences(context)
                     .registerOnSharedPreferenceChangeListener(this)
+            requestLocationButton.setOnClickListener {
+                lifecycleOwner.
+            }
 
         }
 
@@ -50,7 +58,7 @@ class BoundLocationManager {
 
     companion object {
 
-        fun bindLocationListenerIn(context: Context, lifecycleOwner: LifecycleOwner) =
-            BoundLocationListener(context, lifecycleOwner)
+        fun bindLocationListenerIn(context: Context, lifecycleOwner: LifecycleOwner, requestButton: Button, removeButton: Button) =
+            BoundLocationListener(context, lifecycleOwner, requestButton, removeButton)
     }
 }

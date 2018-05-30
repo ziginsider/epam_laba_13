@@ -60,13 +60,17 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             if (!checkPermission()) {
                 requestPermission()
             } else {
-                val locationListener
-                        = BoundLocationManager.bindLocationListenerIn(applicationContext, this)
+                bindLocationListener()
             }
         }
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    fun bindLocationListener() {
+        BoundLocationManager.bindLocationListenerIn(this, this,
+                requestLocationButton, removeLocationButton)
     }
 
     override fun onStart() {
@@ -131,8 +135,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 if (grantResults.isNotEmpty()
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     toast("Permission granted")
+                    bindLocationListener()
                 } else {
                     toast("Permission denied")
+
                 }
             }
         }
