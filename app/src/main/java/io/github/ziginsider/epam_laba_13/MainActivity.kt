@@ -26,7 +26,19 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 
-
+/**
+ * Activity that uses a bound and started service [LocationService] for location updates.
+ *
+ * After requesting location updates, when the activity ceases to be in the foreground,
+ * the service promotes itself to a foreground service and continues receiving location updates.
+ * When the activity comes back to the foreground, the foreground service stops, and the
+ * notification associated with that foreground service is removed.
+ *
+ * Activity draws a location path (polylines) on a map
+ *
+ * @since 2018-05-28
+ * @author Alex Kisel
+ */
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener
         , OnMapReadyCallback {
 
@@ -95,6 +107,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private val serviceConnection = object : ServiceConnection {
+
         override fun onServiceConnected(className: ComponentName?, localService: IBinder?) {
             val binder = localService as LocationService.LocalBinder
             service = binder.service
@@ -137,15 +150,16 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
-                    
+
                     marker?.position = LatLng(lastLatitude, lastLongitude)
                 } else {
                     isLastLocation = true
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
                     marker = map?.addMarker(MarkerOptions()
-                            .position(LatLng(lastLongitude, lastLongitude))
+                            .position(LatLng(lastLatitude, lastLongitude))
                             .title("Current position"))
+
                     map?.animateCamera(CameraUpdateFactory
                             .newLatLngZoom(LatLng(it.latitude, it.longitude), MAP_ZOOM))
                 }
@@ -181,8 +195,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     override fun onMapReady(googleMap: GoogleMap?) {
         googleMap ?: return
         map = googleMap
-
-
     }
 
     companion object {
