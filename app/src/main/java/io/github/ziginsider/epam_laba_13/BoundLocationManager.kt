@@ -5,16 +5,16 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.content.SyncRequest
 import android.preference.PreferenceManager
 import android.widget.Button
 import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
 
 class BoundLocationManager {
 
-    class BoundLocationListener(val context: Context,
-                                val lifecycleOwner: LifecycleOwner,
+    class BoundLocationListener(lifecycleOwner: LifecycleOwner,
+                                val context: Context,
                                 val requestLocationButton: Button,
                                 val removeLocationButton: Button)
         : LifecycleObserver, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -28,9 +28,13 @@ class BoundLocationManager {
             PreferenceManager.getDefaultSharedPreferences(context)
                     .registerOnSharedPreferenceChangeListener(this)
             requestLocationButton.setOnClickListener {
-                lifecycleOwner.
+                service?.requestLocationUpdates()
             }
-
+            removeLocationButton.setOnClickListener {
+                service?.removeLocationUpdates()
+            }
+            bindService(Intent(context, LocationService::class.java), serviceConnection,
+                    Context.BIND_AUTO_CREATE)
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -58,7 +62,7 @@ class BoundLocationManager {
 
     companion object {
 
-        fun bindLocationListenerIn(context: Context, lifecycleOwner: LifecycleOwner, requestButton: Button, removeButton: Button) =
-            BoundLocationListener(context, lifecycleOwner, requestButton, removeButton)
+        fun bindLocationListenerIn(lifecycleOwner: LifecycleOwner, context: Context, requestButton: Button, removeButton: Button) =
+            BoundLocationListener(lifecycleOwner, context, requestButton, removeButton)
     }
 }

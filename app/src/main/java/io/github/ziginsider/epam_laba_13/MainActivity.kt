@@ -15,16 +15,13 @@ import android.support.v4.content.LocalBroadcastManager
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
-import io.github.ziginsider.epam_laba_13.utils.getLocationText
-import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
-import io.github.ziginsider.epam_laba_13.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import io.github.ziginsider.epam_laba_13.utils.*
 
 /**
  * Activity that uses a bound and started service [LocationService] for location updates.
@@ -68,7 +65,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         mapFragment.getMapAsync(this)
     }
 
-    fun bindLocationListener() {
+    private fun bindLocationListener() {
         BoundLocationManager.bindLocationListenerIn(this, this,
                 requestLocationButton, removeLocationButton)
     }
@@ -137,8 +134,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     toast("Permission granted")
                     bindLocationListener()
                 } else {
-                    toast("Permission denied")
-
+                    toast("Permission denied. Unfortunately, the app won't work correctly")
+                    requestLocationButton.hide()
+                    removeLocationButton.hide()
                 }
             }
         }
