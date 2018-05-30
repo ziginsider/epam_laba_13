@@ -8,10 +8,7 @@ import android.content.*
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.widget.Button
-import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
-import io.github.ziginsider.epam_laba_13.utils.hide
-import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
-import io.github.ziginsider.epam_laba_13.utils.show
+import io.github.ziginsider.epam_laba_13.utils.*
 
 class BoundLocationManager {
 
@@ -30,6 +27,7 @@ class BoundLocationManager {
 
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun initLocationActivityState() {
+            logi(context.javaClass.simpleName, "[ Activity onStart() ]")
             PreferenceManager.getDefaultSharedPreferences(context)
                     .registerOnSharedPreferenceChangeListener(this)
             requestLocationButton.setOnClickListener {
@@ -45,6 +43,7 @@ class BoundLocationManager {
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun unbindService() {
+            logi(context.javaClass.simpleName, "[ Activity onStop() ]")
             if (isBound) {
                 context.unbindService(serviceConnection)
                 isBound = false

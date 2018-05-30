@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import io.github.ziginsider.epam_laba_13.utils.logi
 
 class BoundMapManager {
 
@@ -39,12 +40,14 @@ class BoundMapManager {
 
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
         fun registerReceiver() {
+            logi(context.javaClass.simpleName, "[ Activity onResume() ]")
             LocalBroadcastManager.getInstance(context).registerReceiver(myReceiver,
                     IntentFilter(LocationService.ACTION_BROADCAST))
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         fun unregisterReceiver() {
+            logi(context.javaClass.simpleName, "[ Activity onPause() ]")
             LocalBroadcastManager.getInstance(context).unregisterReceiver(myReceiver)
         }
 
