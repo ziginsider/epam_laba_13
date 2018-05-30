@@ -19,8 +19,18 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import io.github.ziginsider.epam_laba_13.utils.logi
 
+/**
+ * implements method [bindMapListenerIn] for create [BoundMapListener]
+ *
+ * @since 2018-05-29
+ * @author Alex Kisel
+ */
 class BoundMapManager {
 
+    /**
+     * Implements listener with help [MyReceiver] for location updates and draws the changes
+     * on [GoogleMap]
+     */
     class BoundMapListener(lifecycleOwner: LifecycleOwner,
                            private val context: Context,
                            private val map: GoogleMap)

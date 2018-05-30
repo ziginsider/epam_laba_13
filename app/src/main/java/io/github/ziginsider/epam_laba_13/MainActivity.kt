@@ -13,14 +13,15 @@ import kotlinx.android.synthetic.main.activity_main.*
 import io.github.ziginsider.epam_laba_13.utils.*
 
 /**
- * Activity that uses a bound and started service [LocationService] for location updates.
+ * Activity that uses a bound and started service [LocationService] for location updates with help
+ * [BoundLocationManager].
  *
  * After requesting location updates, when the activity ceases to be in the foreground,
  * the service promotes itself to a foreground service and continues receiving location updates.
  * When the activity comes back to the foreground, the foreground service stops, and the
  * notification associated with that foreground service is removed.
  *
- * Activity draws a location path (polylines) on a map
+ * Activity draws a location path (polylines) on a map with help [BoundMapManager]
  *
  * @since 2018-05-28
  * @author Alex Kisel
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun bindLocationListener() {
-        BoundLocationManager.bindLocationListenerIn(this, this,
+        BoundLocationManager.bindLocationRunnerIn(this, this,
                 requestLocationButton, removeLocationButton)
     }
 

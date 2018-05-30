@@ -10,12 +10,21 @@ import android.preference.PreferenceManager
 import android.widget.Button
 import io.github.ziginsider.epam_laba_13.utils.*
 
+/**
+ * implements method [bindLocationRunnerIn] for create [LocationRunner]
+ *
+ * @since 2018-05-29
+ * @author Alex Kisel
+ */
 class BoundLocationManager {
 
-    class BoundLocationListener(lifecycleOwner: LifecycleOwner,
-                                private val context: Context,
-                                private val requestLocationButton: Button,
-                                private val removeLocationButton: Button)
+    /**
+     * Runs a location requests with help a bound and started service [LocationService]
+     */
+    class LocationRunner(lifecycleOwner: LifecycleOwner,
+                         private val context: Context,
+                         private val requestLocationButton: Button,
+                         private val removeLocationButton: Button)
         : LifecycleObserver, SharedPreferences.OnSharedPreferenceChangeListener {
 
         init {
@@ -86,9 +95,9 @@ class BoundLocationManager {
 
     companion object {
 
-        fun bindLocationListenerIn(lifecycleOwner: LifecycleOwner, context: Context,
-                                   requestButton: Button, removeButton: Button) {
-            BoundLocationListener(lifecycleOwner, context, requestButton, removeButton)
+        fun bindLocationRunnerIn(lifecycleOwner: LifecycleOwner, context: Context,
+                                 requestButton: Button, removeButton: Button) {
+            LocationRunner(lifecycleOwner, context, requestButton, removeButton)
         }
     }
 }
