@@ -70,6 +70,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 requestLocationButton, removeLocationButton)
     }
 
+    private fun bindMapListener(map: GoogleMap) {
+        BoundMapManager.bindMapListenerIn(this, this, map)
+    }
+
     override fun onStart() {
         super.onStart()
         PreferenceManager.getDefaultSharedPreferences(this)
