@@ -49,7 +49,12 @@ class BoundLocationManager {
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun unbindService() {
-
+            if (isBound) {
+                unbindService(serviceConnection)
+                isBound = false
+            }
+            PreferenceManager.getDefaultSharedPreferences(context)
+                    .unregisterOnSharedPreferenceChangeListener(this)
         }
 
         override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences,
