@@ -10,14 +10,15 @@ import android.preference.PreferenceManager
 import android.widget.Button
 import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
 import io.github.ziginsider.epam_laba_13.utils.hide
+import io.github.ziginsider.epam_laba_13.utils.requestingLocationUpdates
 import io.github.ziginsider.epam_laba_13.utils.show
 
 class BoundLocationManager {
 
     class BoundLocationListener(lifecycleOwner: LifecycleOwner,
-                                val context: Context,
-                                val requestLocationButton: Button,
-                                val removeLocationButton: Button)
+                                private val context: Context,
+                                private val requestLocationButton: Button,
+                                private val removeLocationButton: Button)
         : LifecycleObserver, SharedPreferences.OnSharedPreferenceChangeListener {
 
         init {
@@ -37,6 +38,7 @@ class BoundLocationManager {
             removeLocationButton.setOnClickListener {
                 service?.removeLocationUpdates()
             }
+            setButtonState(requestingLocationUpdates(context))
             context.bindService(Intent(context, LocationService::class.java), serviceConnection,
                     Context.BIND_AUTO_CREATE)
         }
@@ -60,8 +62,6 @@ class BoundLocationManager {
 
         private fun setButtonState(requestingLocationUpdates: Boolean) {
             if (requestingLocationUpdates) {
-//                requestLocationButton.isEnabled = false
-//                removeLocationButton.isEnabled = true
                 requestLocationButton.hide()
                 removeLocationButton.show()
             } else {

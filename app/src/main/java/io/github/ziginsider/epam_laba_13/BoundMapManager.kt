@@ -21,19 +21,21 @@ import com.google.android.gms.maps.model.PolylineOptions
 class BoundMapManager {
 
     class BoundMapListener(lifecycleOwner: LifecycleOwner,
-                           val context: Context,
-                           val map: GoogleMap)
+                           private val context: Context,
+                           private val map: GoogleMap)
         : LifecycleObserver {
-
-        init {
-            lifecycleOwner.lifecycle.addObserver(this)
-        }
 
         private var myReceiver = MyReceiver()
         private var isLastLocation = false
         private var lastLatitude = 0.0
         private var lastLongitude = 0.0
         private var marker: Marker? = null
+
+        init {
+            lifecycleOwner.lifecycle.addObserver(this)
+            LocalBroadcastManager.getInstance(context).registerReceiver(myReceiver,
+                    IntentFilter(LocationService.ACTION_BROADCAST))
+        }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
         fun registerReceiver() {
@@ -50,8 +52,6 @@ class BoundMapManager {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val location = intent?.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
                 location?.let {
-                    //textLocation.text = getLocationText(it)
-
                     if (isLastLocation) {
                         val line = map.addPolyline(PolylineOptions()
                                 .add(LatLng(lastLatitude, lastLongitude),
