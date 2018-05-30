@@ -16,6 +16,8 @@ class BoundMapManager {
             lifecycleOwner.lifecycle.addObserver(this)
         }
 
+        private var myReceiver = MyReceiver()
+
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
         fun registerReceiver() {
 
