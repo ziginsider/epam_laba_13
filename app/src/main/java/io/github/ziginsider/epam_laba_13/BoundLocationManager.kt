@@ -4,27 +4,30 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.OnLifecycleEvent
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
+import android.os.IBinder
 import android.preference.PreferenceManager
 import android.widget.Button
-import io.github.ziginsider.epam_laba_13.utils.KEY_REQUESTING_LOCATION_UPDATES
+import io.github.ziginsider.epam_laba_13.utils.*
 
 class BoundLocationManager {
 
     class BoundLocationListener(lifecycleOwner: LifecycleOwner,
-                                val context: Context,
-                                val requestLocationButton: Button,
-                                val removeLocationButton: Button)
+                                private val context: Context,
+                                private val requestLocationButton: Button,
+                                private val removeLocationButton: Button)
         : LifecycleObserver, SharedPreferences.OnSharedPreferenceChangeListener {
 
         init {
             lifecycleOwner.lifecycle.addObserver(this)
         }
 
+        private var service: LocationService? = null
+        private var isBound = false
+
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun initLocationActivityState() {
+            logi(context.javaClass.simpleName, "[ Activity onStart() ]")
             PreferenceManager.getDefaultSharedPreferences(context)
                     .registerOnSharedPreferenceChangeListener(this)
             requestLocationButton.setOnClickListener {
@@ -33,14 +36,16 @@ class BoundLocationManager {
             removeLocationButton.setOnClickListener {
                 service?.removeLocationUpdates()
             }
-            bindService(Intent(context, LocationService::class.java), serviceConnection,
+            setButtonState(requestingLocationUpdates(context))
+            context.bindService(Intent(context, LocationService::class.java), serviceConnection,
                     Context.BIND_AUTO_CREATE)
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun unbindService() {
+            logi(context.javaClass.simpleName, "[ Activity onStop() ]")
             if (isBound) {
-                unbindService(serviceConnection)
+                context.unbindService(serviceConnection)
                 isBound = false
             }
             PreferenceManager.getDefaultSharedPreferences(context)
@@ -51,6 +56,30 @@ class BoundLocationManager {
                                                str: String?) {
             if (str == KEY_REQUESTING_LOCATION_UPDATES) {
                 setButtonState(sharedPreferences.getBoolean(KEY_REQUESTING_LOCATION_UPDATES, false))
+            }
+        }
+
+        private fun setButtonState(requestingLocationUpdates: Boolean) {
+            if (requestingLocationUpdates) {
+                requestLocationButton.hide()
+                removeLocationButton.show()
+            } else {
+                requestLocationButton.show()
+                removeLocationButton.hide()
+            }
+        }
+
+        private val serviceConnection = object : ServiceConnection {
+
+            override fun onServiceConnected(className: ComponentName?, localService: IBinder?) {
+                val binder = localService as LocationService.LocalBinder
+                service = binder.service
+                isBound = true
+            }
+
+            override fun onServiceDisconnected(className: ComponentName?) {
+                service = null
+                isBound = false
             }
         }
     }
