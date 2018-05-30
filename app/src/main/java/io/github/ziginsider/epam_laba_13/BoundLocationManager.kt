@@ -37,16 +37,6 @@ class BoundLocationManager {
                     Context.BIND_AUTO_CREATE)
         }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun registerReceiver() {
-
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        fun unregisterReceiver() {
-
-        }
-
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun unbindService() {
             if (isBound) {
@@ -67,7 +57,9 @@ class BoundLocationManager {
 
     companion object {
 
-        fun bindLocationListenerIn(lifecycleOwner: LifecycleOwner, context: Context, requestButton: Button, removeButton: Button) =
+        fun bindLocationListenerIn(lifecycleOwner: LifecycleOwner, context: Context,
+                                   requestButton: Button, removeButton: Button) {
             BoundLocationListener(lifecycleOwner, context, requestButton, removeButton)
+        }
     }
 }
