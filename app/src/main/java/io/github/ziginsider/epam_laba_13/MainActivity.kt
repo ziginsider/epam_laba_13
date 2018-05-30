@@ -149,7 +149,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                             .color(Color.RED)
                             .clickable(true))
 
-
                     lastLatitude = it.latitude
                     lastLongitude = it.longitude
 
