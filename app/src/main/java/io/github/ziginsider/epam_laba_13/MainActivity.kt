@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     toast("Permission granted")
                     bindLocationListener()
                 } else {
-                    toast("Permission denied. Unfortunately, the app won't work correctly")
+                    toast("Permission denied. Unfortunately the app won't work correctly")
                     requestLocationButton.hide()
                     removeLocationButton.hide()
                 }

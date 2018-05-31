@@ -1,9 +1,6 @@
 package io.github.ziginsider.epam_laba_13
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.OnLifecycleEvent
+import android.arch.lifecycle.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
