@@ -35,10 +35,14 @@ class BoundLocationManager {
         private var isBound = false
 
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun initLocationActivityState() {
-            logi(context.javaClass.simpleName, "[ Activity onStart() ]")
+        fun registerSharedPreferenceListener() {
             PreferenceManager.getDefaultSharedPreferences(context)
                     .registerOnSharedPreferenceChangeListener(this)
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        fun initLocationActivityUiState() {
+            logi(context.javaClass.simpleName, "[ Activity onStart() ]")
             requestLocationButton.setOnClickListener {
                 service?.requestLocationUpdates()
             }
@@ -46,17 +50,25 @@ class BoundLocationManager {
                 service?.removeLocationUpdates()
             }
             setButtonState(requestingLocationUpdates(context))
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        fun bindLocationService() {
             context.bindService(Intent(context, LocationService::class.java), serviceConnection,
                     Context.BIND_AUTO_CREATE)
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun unbindService() {
+        fun unbindLocationService() {
             logi(context.javaClass.simpleName, "[ Activity onStop() ]")
             if (isBound) {
                 context.unbindService(serviceConnection)
                 isBound = false
             }
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+        fun removeSharedPreferenceListener() {
             PreferenceManager.getDefaultSharedPreferences(context)
                     .unregisterOnSharedPreferenceChangeListener(this)
         }
