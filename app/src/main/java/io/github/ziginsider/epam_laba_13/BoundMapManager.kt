@@ -37,15 +37,11 @@ class BoundMapManager {
         : LifecycleObserver {
 
         private var myReceiver = MyReceiver()
-        private var isLastLocation = false
-        private var lastLatitude = 0.0
-        private var lastLongitude = 0.0
+        private var previousLocation: Location? = null
         private var marker: Marker? = null
 
         init {
             lifecycleOwner.lifecycle.addObserver(this)
-            LocalBroadcastManager.getInstance(context).registerReceiver(myReceiver,
-                    IntentFilter(LocationService.ACTION_BROADCAST))
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -62,27 +58,25 @@ class BoundMapManager {
         }
 
         private inner class MyReceiver : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                val location = intent?.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
-                location?.let {
-                    if (isLastLocation) {
-                        addNewLine(it)
-                        lastLatitude = it.latitude
-                        lastLongitude = it.longitude
-                        marker?.position = LatLng(lastLatitude, lastLongitude)
-                    } else {
-                        isLastLocation = true
-                        lastLatitude = it.latitude
-                        lastLongitude = it.longitude
-                        initMap(it)
-                    }
+            override fun onReceive(context: Context?, intent: Intent) {
+                val newLocation = intent.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
+                if (previousLocation == null) {
+                    initMap(newLocation)
+                } else {
+                    addNewLine(previousLocation!!, newLocation)
+                    moveMarker(newLocation)
                 }
+                previousLocation = newLocation
             }
 
-            private fun addNewLine(location: Location) {
+            private fun moveMarker(newLocation: Location) {
+                marker?.position = LatLng(newLocation.latitude, newLocation.longitude)
+            }
+
+            private fun addNewLine(previousLocation: Location, newLocation: Location) {
                 map.addPolyline(PolylineOptions()
-                        .add(LatLng(lastLatitude, lastLongitude),
-                                LatLng(location.latitude, location.longitude))
+                        .add(LatLng(previousLocation.latitude, previousLocation.longitude),
+                                LatLng(newLocation.latitude, newLocation.longitude))
                         .width(LINE_WIDTH)
                         .color(Color.RED)
                         .clickable(true))
@@ -91,7 +85,7 @@ class BoundMapManager {
             private fun initMap(location: Location) {
                 map.run {
                     marker = addMarker(MarkerOptions()
-                            .position(LatLng(lastLatitude, lastLongitude))
+                            .position(LatLng(location.latitude, location.longitude))
                             .title("Current position"))
                     animateCamera(CameraUpdateFactory
                             .newLatLngZoom(LatLng(location.latitude, location.longitude), MAP_ZOOM))
